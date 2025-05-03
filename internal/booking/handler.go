@@ -37,7 +37,7 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	err = h.Service.Create(userId, booking)
+	err = h.Service.Create(c.Request.Context(), userId, booking)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"statusCode:": http.StatusInternalServerError, "message": fmt.Sprintf("Error when attempting to create booking: %s", err.Error())})
@@ -70,7 +70,7 @@ func (h *Handler) GetById(c *gin.Context) {
 		return
 	}
 
-	booking, err := h.Service.GetById(userId, id)
+	booking, err := h.Service.GetById(c.Request.Context(), userId, id)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode:": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get booking with id %d %s", id, err.Error())})

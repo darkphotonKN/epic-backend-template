@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -14,11 +15,11 @@ type Handler struct {
 }
 
 type Service interface {
-	GetById(id uuid.UUID) (*models.User, error)
-	Create(user models.User) error
+	GetById(ctx context.Context, id uuid.UUID) (*models.User, error)
+	Create(ctx context.Context, user models.User) error
 	HashPassword(password string) (string, error)
-	GetAll() ([]*Response, error)
-	Login(loginReq LoginRequest) (*LoginResponse, error)
+	GetAll(ctx context.Context) ([]*Response, error)
+	Login(ctx context.Context, loginReq LoginRequest) (*LoginResponse, error)
 }
 
 func NewHandler(service Service) *Handler {
@@ -35,7 +36,7 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	err := h.service.Create(user)
+	err := h.service.Create(c.Request.Context(), user)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"statusCode:": http.StatusInternalServerError, "message": fmt.Sprintf("Error when attempting to create user: %s", err.Error())})
@@ -58,7 +59,7 @@ func (h *Handler) GetById(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.GetById(id)
+	user, err := h.service.GetById(c.Request.Context(), id)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode:": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get user with id %d %s", id, err.Error())})
@@ -72,7 +73,7 @@ func (h *Handler) GetById(c *gin.Context) {
 
 // gets all users with bookings
 func (h *Handler) GetAll(c *gin.Context) {
-	users, err := h.service.GetAll()
+	users, err := h.service.GetAll(c.Request.Context())
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode:": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all users: %s:\n", err.Error())})
@@ -92,7 +93,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.Login(loginReq)
+	user, err := h.service.Login(c.Request.Context(), loginReq)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to login user: %s\n", err)})

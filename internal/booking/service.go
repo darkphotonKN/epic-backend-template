@@ -1,6 +1,8 @@
 package booking
 
 import (
+	"context"
+
 	"github.com/darkphotonKN/epic-backend-template/internal/models"
 	"github.com/google/uuid"
 )
@@ -15,14 +17,14 @@ func NewService(repo *Repository) *Service {
 	}
 }
 
-func (s *Service) GetById(userId uuid.UUID, id uuid.UUID) (*models.Booking, error) {
-	return s.Repo.GetById(userId, id)
+func (s *Service) GetById(ctx context.Context, userId uuid.UUID, id uuid.UUID) (*models.Booking, error) {
+	return s.Repo.GetById(ctx, userId, id)
 }
 
-func (s *Service) Create(userId uuid.UUID, req CreateRequest) error {
-	return s.Repo.Create(userId, req)
+func (s *Service) Create(ctx context.Context, userId uuid.UUID, req CreateRequest) error {
+	return s.Repo.Create(ctx, userId, req)
 }
 
-func (s *Service) CreateTwo(userId uuid.UUID, req CreateRequest) error {
-	return s.Repo.Create(userId, req)
+func (s *Service) CreateTwo(ctx context.Context, userId uuid.UUID, req CreateRequest) error {
+	return s.Repo.Create(ctx, userId, req)
 }

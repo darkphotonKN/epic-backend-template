@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -16,10 +17,10 @@ type service struct {
 }
 
 type Repository interface {
-	Create(user models.User) error
-	GetById(id uuid.UUID) (*models.User, error)
-	GetAll() ([]*Response, error)
-	GetUserByEmail(email string) (*models.User, error)
+	Create(ctx context.Context, user models.User) error
+	GetById(ctx context.Context, id uuid.UUID) (*models.User, error)
+	GetAll(ctx context.Context) ([]*Response, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
 func NewService(repo Repository) Service {
@@ -28,11 +29,11 @@ func NewService(repo Repository) Service {
 	}
 }
 
-func (s *service) GetById(id uuid.UUID) (*models.User, error) {
-	return s.Repo.GetById(id)
+func (s *service) GetById(ctx context.Context, id uuid.UUID) (*models.User, error) {
+	return s.Repo.GetById(ctx, id)
 }
 
-func (s *service) Create(user models.User) error {
+func (s *service) Create(ctx context.Context, user models.User) error {
 	hashedPw, err := s.HashPassword(user.Password)
 
 	if err != nil {
@@ -42,7 +43,7 @@ func (s *service) Create(user models.User) error {
 	// update user's password with hashed password.
 	user.Password = hashedPw
 
-	return s.Repo.Create(user)
+	return s.Repo.Create(ctx, user)
 }
 
 // HashPassword hashes the given password using bcrypt.
@@ -54,12 +55,12 @@ func (s *service) HashPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (s *service) GetAll() ([]*Response, error) {
-	return s.Repo.GetAll()
+func (s *service) GetAll(ctx context.Context) ([]*Response, error) {
+	return s.Repo.GetAll(ctx)
 }
 
-func (s *service) Login(loginReq LoginRequest) (*LoginResponse, error) {
-	user, err := s.Repo.GetUserByEmail(loginReq.Email)
+func (s *service) Login(ctx context.Context, loginReq LoginRequest) (*LoginResponse, error) {
+	user, err := s.Repo.GetUserByEmail(ctx, loginReq.Email)
 
 	if err != nil {
 		return nil, errors.New("Could not get user with provided email.")

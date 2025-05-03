@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -19,10 +20,10 @@ func NewRepository(db *sqlx.DB) Repository {
 	}
 }
 
-func (r *repository) Create(user models.User) error {
+func (r *repository) Create(ctx context.Context, user models.User) error {
 	query := `INSERT INTO users (name, email, password) VALUES (:name, :email, :password)`
 
-	_, err := r.DB.NamedExec(query, user)
+	_, err := r.DB.NamedExecContext(ctx, query, user)
 
 	if err != nil {
 		return err
@@ -31,12 +32,12 @@ func (r *repository) Create(user models.User) error {
 	return nil
 }
 
-func (r *repository) GetById(id uuid.UUID) (*models.User, error) {
+func (r *repository) GetById(ctx context.Context, id uuid.UUID) (*models.User, error) {
 	query := `SELECT * FROM users WHERE users.id = $1`
 
 	var user models.User
 
-	err := r.DB.Get(&user, query, id)
+	err := r.DB.GetContext(ctx, &user, query, id)
 
 	if err != nil {
 		return nil, err
@@ -48,7 +49,7 @@ func (r *repository) GetById(id uuid.UUID) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *repository) GetAll() ([]*Response, error) {
+func (r *repository) GetAll(ctx context.Context) ([]*Response, error) {
 	query := `
 	SELECT 
 		users.id,
@@ -79,7 +80,7 @@ func (r *repository) GetAll() ([]*Response, error) {
 		BookingUpdatedAt *time.Time `db:"booking_updated_at"`
 	}
 
-	if err := r.DB.Select(&results, query); err != nil {
+	if err := r.DB.SelectContext(ctx, &results, query); err != nil {
 		return nil, err
 	}
 
@@ -139,13 +140,13 @@ func (r *repository) GetAll() ([]*Response, error) {
 	return usersResponse, nil
 }
 
-func (r *repository) GetUserByEmail(email string) (*models.User, error) {
+func (r *repository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 	query := `SELECT * FROM users WHERE users.email = $1`
 
 	fmt.Println("Querying user with email:", email)
 
-	err := r.DB.Get(&user, query, email)
+	err := r.DB.GetContext(ctx, &user, query, email)
 	fmt.Println("Error:", err)
 
 	if err != nil {

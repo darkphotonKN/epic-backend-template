@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/darkphotonKN/epic-backend-template/internal/models"
@@ -18,7 +19,7 @@ func NewRepository(db *sqlx.DB) *Repository {
 	}
 }
 
-func (r *Repository) Create(userId uuid.UUID, req CreateRequest) error {
+func (r *Repository) Create(ctx context.Context, userId uuid.UUID, req CreateRequest) error {
 	query := `INSERT INTO bookings(user_id, start_date, end_date, status) VALUES (:userId, :startDate, :endDate, :status)`
 
 	// create fields required for DB insert
@@ -31,7 +32,7 @@ func (r *Repository) Create(userId uuid.UUID, req CreateRequest) error {
 
 	fmt.Printf("fields: %+v", fields)
 
-	_, err := r.DB.NamedExec(query, fields)
+	_, err := r.DB.NamedExecContext(ctx, query, fields)
 
 	if err != nil {
 		return err
@@ -40,7 +41,7 @@ func (r *Repository) Create(userId uuid.UUID, req CreateRequest) error {
 	return nil
 }
 
-func (r *Repository) GetById(userId uuid.UUID, id uuid.UUID) (*models.Booking, error) {
+func (r *Repository) GetById(ctx context.Context, userId uuid.UUID, id uuid.UUID) (*models.Booking, error) {
 	// One to Many example
 	query := `
 	SELECT 
@@ -55,7 +56,7 @@ func (r *Repository) GetById(userId uuid.UUID, id uuid.UUID) (*models.Booking, e
 
 	var booking models.Booking
 
-	err := r.DB.Get(&booking, query, id, userId)
+	err := r.DB.GetContext(ctx, &booking, query, id, userId)
 
 	if err != nil {
 		return nil, err

@@ -5,21 +5,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/darkphotonKN/epic-backend-template/internal/constants"
 	"github.com/darkphotonKN/epic-backend-template/internal/models"
 	"github.com/golang-jwt/jwt/v5"
-)
-
-type TokenType string
-
-const (
-	Refresh TokenType = "refresh"
-	Access  TokenType = "access"
 )
 
 /**
 * Generates and signs a JWT token with claims of either the "access" or "refresh" types.
 **/
-func GenerateJWT(user models.User, tokenType TokenType, expiration time.Duration) (string, error) {
+func GenerateJWT(user models.User, tokenType constants.TokenType, expiration time.Duration) (string, error) {
 	JWTSecret := []byte(os.Getenv("JWT_SECRET"))
 
 	// Define the custom claims for the token
@@ -50,12 +44,12 @@ func RefreshToken(refreshToken string, user models.User) (string, int, error) {
 
 	// Check if the token type is "refresh"
 	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["tokenType"] != string(Refresh) {
+	if !ok || claims["tokenType"] != string(constants.Refresh) {
 		return "", 0, errors.New("invalid token type")
 	}
 
 	// Generate a new access token with a 15-minute expiration
-	newAccessToken, err := GenerateJWT(user, Access, 15*time.Minute)
+	newAccessToken, err := GenerateJWT(user, constants.Access, 15*time.Minute)
 	if err != nil {
 		return "", 0, errors.New("could not generate new access token")
 	}

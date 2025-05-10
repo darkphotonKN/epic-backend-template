@@ -1,4 +1,4 @@
-package errorutils
+package constants
 
 import "errors"
 
@@ -13,4 +13,5 @@ var (
 	ErrConstraintViolation = errors.New("Input does not follow column constraints.")
 	ErrForbidden           = errors.New("You do not have permission to access this resource.")
 	ErrUnauthorized        = errors.New("Incorrect credentials entered during when attempting to authenticate.")
+	ErrNoRowsAffected      = errors.New("Operation executed successfully but no rows were affected.")
 )

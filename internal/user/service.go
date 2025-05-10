@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/darkphotonKN/epic-backend-template/internal/auth"
+	"github.com/darkphotonKN/epic-backend-template/internal/constants"
 	"github.com/darkphotonKN/epic-backend-template/internal/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -73,9 +74,9 @@ func (s *service) Login(ctx context.Context, loginReq LoginRequest) (*LoginRespo
 
 	// construct response with both user info and auth credentials
 	accessExpiryTime := time.Minute * 60
-	accessToken, err := auth.GenerateJWT(*user, auth.Access, accessExpiryTime)
+	accessToken, err := auth.GenerateJWT(*user, constants.Access, accessExpiryTime)
 	refreshExpiryTime := time.Hour * 24 * 7
-	refreshToken, err := auth.GenerateJWT(*user, auth.Refresh, refreshExpiryTime)
+	refreshToken, err := auth.GenerateJWT(*user, constants.Refresh, refreshExpiryTime)
 
 	user.Password = ""
 

@@ -11,7 +11,7 @@ import (
 
 /**
 * Main entry point to entire application.
-* NOTE: Keep code here as clean and little as possible.
+* NOTE: Keep code here as clean and minimal as possible.
 **/
 func main() {
 	// env setup

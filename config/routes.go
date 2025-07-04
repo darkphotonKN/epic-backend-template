@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/darkphotonKN/eh-hub-data-orchestration-platform/internal/item"
+	"github.com/darkphotonKN/eh-hub-data-orchestration-platform/internal/healthmetrics"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,20 +14,16 @@ func SetupRouter() *gin.Engine {
 	// base route
 	api := router.Group("/api")
 
-	// -- ITEM --
+	// -- HEALTH METRICS --
 
-	// --- Item Setup ---
-	itemService := item.NewService()
-	itemHandler := item.NewHandler(itemService)
+	// --- Health Metrics Setup ---
+	healthMetricsService := healthmetrics.NewService()
+	healthMetricsHandler := healthmetrics.NewHandler(healthMetricsService)
 
-	// --- Item Routes ---
-	itemRoutes := api.Group("/items")
-	itemRoutes.POST("/", itemHandler.Create)
-	itemRoutes.GET("/", itemHandler.GetAll)
-	itemRoutes.GET("/:id", itemHandler.GetById)
-	itemRoutes.PUT("/:id", itemHandler.Update)
-	itemRoutes.DELETE("/:id", itemHandler.Delete)
+	// --- Webhook Routes ---
+	// Garmin webhook endpoint for receiving real-time health data
+	webhookRoutes := api.Group("/webhooks")
+	webhookRoutes.POST("/garmin", healthMetricsHandler.HandleGarminWebhook)
 
 	return router
 }
-

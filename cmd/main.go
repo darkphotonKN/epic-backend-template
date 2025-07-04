@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/darkphotonKN/epic-backend-template/config"
+	"github.com/darkphotonKN/eh-hub-data-orchestration-platform/config"
 	"github.com/joho/godotenv"
 )
 
@@ -18,10 +18,6 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, using system environment variables")
 	}
-
-	// database setup
-	db := config.InitDB()
-	defer db.Close()
 
 	// router setup
 	router := config.SetupRouter()

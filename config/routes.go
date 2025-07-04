@@ -1,8 +1,7 @@
 package config
 
 import (
-	"github.com/darkphotonKN/epic-backend-template/internal/booking"
-	"github.com/darkphotonKN/epic-backend-template/internal/user"
+	"github.com/darkphotonKN/eh-hub-data-orchestration-platform/internal/item"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,31 +14,20 @@ func SetupRouter() *gin.Engine {
 	// base route
 	api := router.Group("/api")
 
-	// -- USER --
+	// -- ITEM --
 
-	// --- User Setup ---
-	userRepo := user.NewRepository(DB)
-	userService := user.NewService(userRepo)
-	userHandler := user.NewHandler(userService)
+	// --- Item Setup ---
+	itemService := item.NewService()
+	itemHandler := item.NewHandler(itemService)
 
-	// --- User Routes ---
-	userRoutes := api.Group("/user")
-	userRoutes.GET("/:id", userHandler.GetById)
-	userRoutes.GET("/", userHandler.GetAll)
-	userRoutes.POST("/signup", userHandler.Create)
-	userRoutes.POST("/signin", userHandler.Login)
-
-	// -- BOOKING --
-
-	// --- Booking Setup ---
-	bookingRepo := booking.NewRepository(DB)
-	bookingService := booking.NewService(bookingRepo)
-	bookingHandler := booking.NewHandler(bookingService)
-
-	// ---  Booking Routes ---
-	bookingRoutes := api.Group("/booking")
-	bookingRoutes.POST("/:user_id", bookingHandler.Create)
-	bookingRoutes.GET("/:id", bookingHandler.GetById)
+	// --- Item Routes ---
+	itemRoutes := api.Group("/items")
+	itemRoutes.POST("/", itemHandler.Create)
+	itemRoutes.GET("/", itemHandler.GetAll)
+	itemRoutes.GET("/:id", itemHandler.GetById)
+	itemRoutes.PUT("/:id", itemHandler.Update)
+	itemRoutes.DELETE("/:id", itemHandler.Delete)
 
 	return router
 }
+

@@ -14,7 +14,7 @@ type Handler struct {
 }
 
 type Service interface {
-	ProcessGarminWebhook(ctx context.Context, payload GarminWebhookPayload) (int, error)
+	ProcessGarminWebhook(ctx context.Context, request GarminWebhookPayload) (*HealthMetricProcessedData, error)
 }
 
 func NewHandler(service Service) *Handler {
@@ -30,31 +30,32 @@ func (h *Handler) HandleGarminWebhook(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		log.Printf("Error parsing Garmin webhook payload: %v", err)
-		c.JSON(http.StatusBadRequest, WebhookResponse{
-			Status:  "error",
-			Message: "Invalid webhook payload format",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"statusCode": http.StatusBadRequest,
+			"message":    "Invalid webhook payload format",
+			"result":     nil,
 		})
 		return
 	}
 
 	// Process the health metrics through our service
-	processedCount, err := h.Service.ProcessGarminWebhook(c.Request.Context(), payload)
+	processedData, err := h.Service.ProcessGarminWebhook(c.Request.Context(), payload)
 
 	// handle service error response
 	if err != nil {
 		log.Printf("Error processing Garmin webhook: %v", err)
-		c.JSON(http.StatusInternalServerError, WebhookResponse{
-			Status:  "error",
-			Message: fmt.Sprintf("Failed to process health data: %s", err.Error()),
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"statusCode": http.StatusInternalServerError,
+			"message":    fmt.Sprintf("Failed to process health data: %s", err.Error()),
+			"result":     nil,
 		})
 		return
 	}
 
 	// success response
-	c.JSON(http.StatusOK, WebhookResponse{
-		Status:    "success",
-		Message:   "Health data processed successfully",
-		Processed: processedCount,
+	c.JSON(http.StatusOK, gin.H{
+		"statusCode": http.StatusOK,
+		"message":    "Health data processed successfully",
+		"result":     processedData,
 	})
 }
-

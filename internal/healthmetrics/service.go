@@ -21,6 +21,6 @@ func NewService() *service {
 // TODO: KIKIIIIII
 // ProcessGarminWebhook handles incoming Garmin webhook data and orchestrates
 // the dual-frequency data flow: real-time to Vantiq, batched to HealthKit
-func (s *service) ProcessGarminWebhook(ctx context.Context, payload GarminWebhookPayload) (*HealthMetricProcessedData, error) {
+func (s *service) ProcessGarminWebhook(ctx context.Context, request GarminWebhookPayload) (*HealthMetricProcessedData, error) {
 	return nil, nil
 }
